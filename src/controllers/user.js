@@ -19,10 +19,7 @@ export async function createVisit(merchant, user) {
 }
 
 async function findUserOrCreate(userId, populateOptions = "visits", options = null) {
-    return UserModel.findOneAndUpdate({ userId }, {}, {
-        new: true, upsert: true
-    }).populate(populateOptions)
-    .populate(options)
+    return UserModel.findOneAndUpdate({ userId }, {}, options).populate(populateOptions)
 }
 
 async function getByUserIdAndSearch(req, res) {
@@ -33,8 +30,8 @@ async function getByUserIdAndSearch(req, res) {
     }
 
     try {
-        const user = await findUserOrCreate(userId,
-            "visits visits.user visits.merchant");
+        const user = await UserModel.findOne({ userId }, { new: false, upsert: false })
+            .populate("visits visits.user visits.merchant");
 
         if (user) {
             const searchText = req.query.searchString
@@ -73,10 +70,18 @@ async function post(req, res) {
     const merchantName = data.merchant.merchantName;
 
     try {
-        const user = await findUserOrCreate(req.params.userId);
+        const user = await findUserOrCreate(req.params.userId, "visits", {
+            new: true, upsert: true
+        });
         const merchant = await findMerchantOrCreate(merchantId, merchantName);
         const visit = await createVisit(merchant, user);
-        user.visits.push(visit);
+        if (visit) {
+            if (user.visits) {
+                user.visits.push(visit);
+            } else {
+                user.visits = [visit];
+            }
+        }
         await user.save();
         res.json({ visitId: visit.visitId, timestamp:visit.timestamp });
     } catch(err) {

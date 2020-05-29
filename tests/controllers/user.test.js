@@ -35,10 +35,8 @@ describe('user controller', () => {
             const res = mockResponse();
             UserModel.findOneAndUpdate = jest.fn().mockReturnValue({
                 populate: jest.fn().mockReturnValue({
-                    populate: jest.fn().mockReturnValue({
-                        save: jest.fn(),
-                        visits: []
-                    })
+                    save: jest.fn(),
+                    visits: []
                 }),
             });
 
@@ -62,10 +60,8 @@ describe('user controller', () => {
         });
 
         it('should return 404 for no user found', async () => {
-            UserModel.findOneAndUpdate = jest.fn().mockReturnValue({
-                populate: jest.fn().mockReturnValue({
-                    populate: jest.fn().mockReturnValue(null)
-                })
+            UserModel.findOne = jest.fn().mockReturnValue({
+                populate: jest.fn().mockReturnValue(null)
             });
 
             const req = mockRequest({userId: 1});
@@ -88,11 +84,9 @@ describe('user controller', () => {
                     userId: 5
                 }
             }
-            UserModel.findOneAndUpdate = jest.fn().mockReturnValue({
+            UserModel.findOne = jest.fn().mockReturnValue({
                 populate: jest.fn().mockReturnValue({
-                    populate: jest.fn().mockReturnValue({
-                        visits: [response]
-                    })
+                    visits: [response]
                 })
             });
 
@@ -121,11 +115,9 @@ describe('user controller', () => {
                     userId: 5
                 }
             }
-            UserModel.findOneAndUpdate = jest.fn().mockReturnValue({
+            UserModel.findOne = jest.fn().mockReturnValue({
                 populate: jest.fn().mockReturnValue({
-                    populate: jest.fn().mockReturnValue({
-                        visits: [response]
-                    })
+                    visits: [response]
                 })
             });
 
